@@ -81,3 +81,12 @@ export const recentActivity = [
   { user: "@SallyMae88", action: "initiated a return process for Order ID 44556GHI", time: "11:00 AM", date: "Today" },
   { user: "@AdminLisa", action: "resolved a delivery issue for Order ID 12345XYZ", time: "10:15 AM", date: "Today" }
 ];
+
+export const recentShipments = [
+  { id: "SH9283746", company: "TechGear Inc.", companyCategory: "Electronics", carrier: "FedEx", route: "Los Angeles, CA → Chicago, IL", date: "Mar 20, 2035", status: "In Transit" },
+  { id: "SH9182635", company: "StyleHub Co.", companyCategory: "Apparel", carrier: "DHL", route: "New York, NY → Atlanta, GA", date: "Mar 19, 2035", status: "Out for Delivery" },
+  { id: "SH9037821", company: "FreshNest", companyCategory: "Home & Kitchen", carrier: "UPS", route: "Dallas, TX → Miami, FL", date: "Mar 18, 2035", status: "Delivered" },
+  { id: "SH9374652", company: "FitPlus Gear", companyCategory: "Sports & Outdoors", carrier: "USPS", route: "Seattle, WA → Denver, CO", date: "Mar 21, 2035", status: "Processing" },
+  { id: "SH9457830", company: "AutoParts Pro", companyCategory: "Automotive", carrier: "Aramex", route: "Detroit, MI → San Diego, CA", date: "Mar 20, 2035", status: "In Transit" }
+];
+
