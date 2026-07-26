@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useShipments } from '../context/ShipmentsContext';
+import { useNavigate } from 'react-router-dom';
 import { 
   Plane, 
   Truck, 
@@ -8,530 +7,533 @@ import {
   Train, 
   Search, 
   Filter, 
-  Calendar,
-  Grid,
-  List,
-  ChevronRight,
-  Plus
+  ChevronRight, 
+  Plus,
+  ChevronDown,
+  ChevronLeft,
+  MapPin
 } from 'lucide-react';
 
-// UI Primitives
-import Card from '../components/ui/Card';
-import Table from '../components/ui/Table';
-import StatusChip from '../components/ui/StatusChip';
-import Button from '../components/ui/Button';
+// Seeded high-fidelity data matching the 12 mockup cards exactly
+const seededShipments = [
+  {
+    id: "#SH9283746",
+    status: "In Transit",
+    type: "Air",
+    company: "TechGear Inc.",
+    category: "Electronics",
+    origin: "Los Angeles, CA",
+    originTime: "Mar 20, 2035 – 10:00 AM",
+    destination: "Chicago, IL",
+    destinationTime: "Mar 23, 2025 – 03:00 PM", // Mockup typo says Mar 23, 2025
+    progress: 60,
+    carrier: "FedEx"
+  },
+  {
+    id: "#SH9182635",
+    status: "Out for Delivery",
+    type: "Road",
+    company: "StyleHub Co.",
+    category: "Apparel",
+    origin: "New York, NY",
+    originTime: "Mar 19, 2035 – 11:30 AM",
+    destination: "Atlanta, GA",
+    destinationTime: "Mar 22, 2025 – 01:00 PM", // Mockup typo says Mar 22, 2025
+    progress: 75,
+    carrier: "DHL"
+  },
+  {
+    id: "#SH9037821",
+    status: "Delivered",
+    type: "Ocean",
+    company: "FreshNest",
+    category: "Home & Kitchen",
+    origin: "Dallas, TX",
+    originTime: "Mar 18, 2035 – 09:00 AM",
+    destination: "Miami, FL",
+    destinationTime: "Mar 21, 2025 – 06:00 PM", // Mockup typo says Mar 21, 2025
+    progress: 100,
+    carrier: "UPS"
+  },
+  {
+    id: "#SH9374652",
+    status: "Processing",
+    type: "Rail",
+    company: "FitPlus Gear",
+    category: "Sports & Outdoors",
+    origin: "Seattle, WA",
+    originTime: "Mar 21, 2035 – 08:45 AM",
+    destination: "Denver, CO",
+    destinationTime: "Mar 25, 2025 – 04:30 PM", // Mockup typo says Mar 25, 2025
+    progress: 40,
+    carrier: "USPS"
+  },
+  {
+    id: "#SH8821349",
+    status: "Out for Delivery",
+    type: "Road",
+    company: "EcoLights",
+    category: "Electronics",
+    origin: "Austin, TX",
+    originTime: "Mar 19, 2035 – 12:00 PM",
+    destination: "Phoenix, AZ",
+    destinationTime: "Mar 21, 2025 – 06:00 PM",
+    progress: 90,
+    carrier: "FedEx"
+  },
+  {
+    id: "#SH9457830",
+    status: "Delivered",
+    type: "Air",
+    company: "AutoParts Pro",
+    category: "Automotive",
+    origin: "Detroit, MI",
+    originTime: "Mar 20, 2035 – 07:15 AM",
+    destination: "San Diego, CA",
+    destinationTime: "Mar 26, 2025 – 02:00 PM",
+    progress: 100,
+    carrier: "Aramex"
+  },
+  {
+    id: "#SH8967432",
+    status: "In Transit",
+    type: "Road",
+    company: "GreenHaven",
+    category: "Home & Garden",
+    origin: "Portland, OR",
+    originTime: "Mar 18, 2035 – 02:45 PM",
+    destination: "Salt Lake City, UT",
+    destinationTime: "Mar 22, 2025 – 11:00 AM",
+    progress: 65,
+    carrier: "USPS"
+  },
+  {
+    id: "#SH8893247",
+    status: "Out for Delivery",
+    type: "Road",
+    company: "ModaWear",
+    category: "Apparel",
+    origin: "Boston, MA",
+    originTime: "Mar 20, 2035 – 01:00 PM",
+    destination: "Charlotte, NC",
+    destinationTime: "Mar 23, 2025 – 08:00 AM",
+    progress: 80,
+    carrier: "DHL"
+  },
+  {
+    id: "#SH9018723",
+    status: "Processing",
+    type: "Rail",
+    company: "SunCore Panels",
+    category: "Electronics",
+    origin: "San Diego, CA",
+    originTime: "Mar 21, 2035 – 09:30 AM",
+    destination: "Reno, NV",
+    destinationTime: "Mar 24, 2025 – 01:30 PM",
+    progress: 30,
+    carrier: "UPS"
+  },
+  {
+    id: "#SH9113471",
+    status: "In Transit",
+    type: "Road",
+    company: "QuickParts",
+    category: "Automotive",
+    origin: "Tampa, FL",
+    originTime: "Mar 20, 2035 – 04:00 PM",
+    destination: "Houston, TX",
+    destinationTime: "Mar 23, 2025 – 12:00 PM",
+    progress: 90,
+    carrier: "Aramex"
+  },
+  {
+    id: "#SH8881190",
+    status: "Out for Delivery",
+    type: "Road",
+    company: "VitaFresh",
+    category: "Food & Beverage",
+    origin: "Nashville, TN",
+    originTime: "Mar 21, 2035 – 06:00 AM",
+    destination: "Jacksonville, FL",
+    destinationTime: "Mar 22, 2025 – 10:00 AM",
+    progress: 85,
+    carrier: "Local Courier"
+  },
+  {
+    id: "#SH8776103",
+    status: "In Transit",
+    type: "Air",
+    company: "StyleDepot",
+    category: "Fashion",
+    origin: "Minneapolis, MN",
+    originTime: "Mar 19, 2035 – 10:15 AM",
+    destination: "Kansas City, MO",
+    destinationTime: "Mar 22, 2025 – 03:30 PM",
+    progress: 60,
+    carrier: "FedEx"
+  }
+];
+
+// Custom vectors matching the specific brand mark designs of companies
+const renderCompanyLogo = (companyName) => {
+  switch (companyName) {
+    case "TechGear Inc.":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-slate-800">
+          <path d="M12 2l10 6.5v7L12 22 2 15.5v-7z" />
+        </svg>
+      );
+    case "StyleHub Co.":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-[#6366F1]">
+          <polygon points="12 2 2 22 22 22" />
+        </svg>
+      );
+    case "FreshNest":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-slate-800">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10" />
+        </svg>
+      );
+    case "FitPlus Gear":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-[#6366F1]">
+          <circle cx="12" cy="12" r="10" />
+          <circle cx="12" cy="12" r="6" />
+        </svg>
+      );
+    case "EcoLights":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-slate-800">
+          <line x1="4" y1="20" x2="20" y2="4" />
+          <line x1="4" y1="4" x2="20" y2="20" />
+        </svg>
+      );
+    case "AutoParts Pro":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-slate-800">
+          <line x1="12" y1="2" x2="12" y2="22" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+          <line x1="4.93" y1="19.07" x2="19.07" y2="4.93" />
+        </svg>
+      );
+    case "GreenHaven":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-[#6366F1]">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+      );
+    case "ModaWear":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-slate-800">
+          <path d="M3 12h18M3 12a9 9 0 0 1 18 0M3 12a9 9 0 0 0 18 0" />
+        </svg>
+      );
+    case "SunCore Panels":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-slate-800">
+          <circle cx="12" cy="12" r="2" />
+          <circle cx="12" cy="4" r="2" />
+          <circle cx="12" cy="20" r="2" />
+          <circle cx="4" cy="12" r="2" />
+          <circle cx="20" cy="12" r="2" />
+        </svg>
+      );
+    case "QuickParts":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-[#6366F1]">
+          <line x1="6" y1="3" x2="10" y2="21" />
+          <line x1="10" y1="3" x2="14" y2="21" />
+          <line x1="14" y1="3" x2="18" y2="21" />
+        </svg>
+      );
+    case "VitaFresh":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-slate-800">
+          <path d="M12 2v20M2 12h22M12 2l8 8-8 8-8-8z" />
+        </svg>
+      );
+    case "StyleDepot":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5.5 w-5.5 text-[#6366F1]">
+          <path d="M12 2a10 10 0 1 0 10 10" />
+          <path d="M12 6a6 6 0 1 0 6 6" />
+        </svg>
+      );
+    default:
+      return (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5 text-slate-400">
+          <circle cx="12" cy="12" r="10" />
+        </svg>
+      );
+  }
+};
 
 export default function Shipments() {
   const navigate = useNavigate();
-  const { shipments } = useShipments();
-  
-  // URL Param Sync for View Toggle
-  const [searchParams, setSearchParams] = useSearchParams();
-  const activeView = searchParams.get('view') || 'table'; // default to table
-
-  // Filters State
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusTab, setStatusTab] = useState('All');
-  
-  // Sorting State
-  const [sortKey, setSortKey] = useState('dateSort');
-  const [sortDirection, setSortDirection] = useState('desc');
+  const [activeFilterTab, setActiveFilterTab] = useState('All');
 
-  // Selection State
-  const [selectedRowIds, setSelectedRowIds] = useState(new Set());
+  // Filtered dataset
+  const filteredShipments = useMemo(() => {
+    return seededShipments.filter((ship) => {
+      // 1. Status Filter tab matching
+      if (activeFilterTab !== 'All' && ship.status !== activeFilterTab) {
+        return false;
+      }
+      // 2. Search query matching
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesId = ship.id.toLowerCase().includes(query);
+        const matchesCompany = ship.company.toLowerCase().includes(query);
+        const matchesCarrier = ship.carrier.toLowerCase().includes(query);
+        if (!matchesId && !matchesCompany && !matchesCarrier) return false;
+      }
+      return true;
+    });
+  }, [activeFilterTab, searchQuery]);
 
-  // Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10); // default show 10 rows
-
-  // View Switcher Handler
-  const handleViewToggle = (viewMode) => {
-    setSearchParams({ view: viewMode });
-    setCurrentPage(1); // Reset page on toggle
+  // Status Badge visual configurations
+  const getStatusBadgeStyle = (status) => {
+    switch (status) {
+      case "In Transit":
+        return "text-[#6366F1] bg-[#EEF2FF] border-[#E0E7FF]";
+      case "Out for Delivery":
+        return "text-[#475569] bg-[#F1F5F9] border-slate-200/50";
+      case "Delivered":
+        return "text-emerald-700 bg-emerald-50 border-emerald-100";
+      case "Processing":
+        return "text-amber-700 bg-amber-50 border-amber-100";
+      default:
+        return "text-slate-500 bg-slate-50 border-slate-100";
+    }
   };
 
-  // Transport Icon Mapping
-  const getTransportIcon = (type) => {
-    const iconClass = "h-4 w-4 shrink-0 text-slate-400";
-    switch (type) {
-      case 'Air Freight':
+  // Cargo Mode Icon render
+  const renderCargoModeIcon = (mode) => {
+    const iconClass = "h-4.5 w-4.5 text-slate-500";
+    switch (mode) {
+      case "Air":
         return <Plane className={iconClass} />;
-      case 'Road Freight':
+      case "Road":
         return <Truck className={iconClass} />;
-      case 'Ocean Freight':
+      case "Ocean":
         return <Ship className={iconClass} />;
-      case 'Rail Freight':
+      case "Rail":
         return <Train className={iconClass} />;
       default:
         return <Truck className={iconClass} />;
     }
   };
 
-  // Metric aggregates from all shipments
-  const metrics = useMemo(() => {
-    const total = shipments.length;
-    const pending = shipments.filter(s => s.status === 'Pending').length;
-    const delivery = shipments.filter(s => s.status === 'Delivery').length;
-    const completed = shipments.filter(s => s.status === 'Completed').length;
-    
-    // Scale aggregates for representation to match the mockup totals
-    return {
-      total: { val: "1,284", change: "+4.6%", note: "this week" },
-      pending: { val: "285", change: "+8.7%", note: "this week" },
-      delivery: { val: "594", change: "-4.2%", note: "from last week" },
-      completed: { val: "405", change: "+3.9%", note: "this week" }
-    };
-  }, [shipments]);
-
-  // Filtering Logic
-  const filteredShipments = useMemo(() => {
-    return shipments.filter((item) => {
-      // 1. Status Tab filter
-      if (statusTab !== 'All' && item.status !== statusTab) {
-        return false;
-      }
-      // 2. Search query filter (matches ID, Company, Origin, Destination, category)
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        const matchesId = item.id.toLowerCase().includes(query);
-        const matchesCompany = item.company.toLowerCase().includes(query);
-        const matchesOrigin = item.origin.toLowerCase().includes(query);
-        const matchesDest = item.destination.toLowerCase().includes(query);
-        const matchesCategory = item.productCategory.toLowerCase().includes(query);
-        
-        if (!matchesId && !matchesCompany && !matchesOrigin && !matchesDest && !matchesCategory) {
-          return false;
-        }
-      }
-      return true;
-    });
-  }, [shipments, searchQuery, statusTab]);
-
-  // Sorting Logic
-  const sortedShipments = useMemo(() => {
-    const sorted = [...filteredShipments];
-    if (sortKey) {
-      sorted.sort((a, b) => {
-        let valA = a[sortKey];
-        let valB = b[sortKey];
-
-        // Custom weight float comparison
-        if (sortKey === 'weight') {
-          valA = a.weightVal || 0;
-          valB = b.weightVal || 0;
-        }
-
-        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-      });
-    }
-    return sorted;
-  }, [filteredShipments, sortKey, sortDirection]);
-
-  // Paginated Output
-  const paginatedShipments = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return sortedShipments.slice(startIndex, startIndex + pageSize);
-  }, [sortedShipments, currentPage, pageSize]);
-
-  const totalPages = Math.ceil(sortedShipments.length / pageSize);
-
-  // Sorting Handlers
-  const handleSort = (key, direction) => {
-    setSortKey(key);
-    setSortDirection(direction);
-  };
-
-  // Row Selection Handlers
-  const handleRowSelect = (id, isChecked) => {
-    setSelectedRowIds(prev => {
-      const next = new Set(prev);
-      if (isChecked) {
-        next.add(id);
-      } else {
-        next.delete(id);
-      }
-      return next;
-    });
-  };
-
-  const handleSelectAll = (isChecked) => {
-    setSelectedRowIds(prev => {
-      const next = new Set(prev);
-      paginatedShipments.forEach(row => {
-        if (isChecked) {
-          next.add(row.id);
-        } else {
-          next.delete(row.id);
-        }
-      });
-      return next;
-    });
-  };
-
-  // Table Column Definitions
-  const columns = [
-    {
-      key: "id",
-      title: "Shipping ID",
-      sortable: true,
-      render: (val, row) => (
-        <div className="flex flex-col gap-0.5">
-          <span className="font-bold text-primary-600 cursor-pointer hover:underline">{val}</span>
-          <div className="flex items-center gap-1">
-            {getTransportIcon(row.type)}
-            <span className="text-[10px] text-slate-400 font-semibold">{row.type}</span>
-          </div>
-        </div>
-      )
-    },
-    {
-      key: "company",
-      title: "Company",
-      sortable: true,
-      render: (val, row) => (
-        <div>
-          <p className="font-semibold text-slate-800 leading-tight">{val}</p>
-          <p className="text-[10px] text-slate-400 font-medium">{row.companyCategory}</p>
-        </div>
-      )
-    },
-    {
-      key: "carrier",
-      title: "Carriers",
-      sortable: true,
-      render: (val) => <span className="font-semibold text-slate-600">{val}</span>
-    },
-    {
-      key: "productCategory",
-      title: "Product Category",
-      sortable: true,
-      render: (val) => <span className="font-semibold text-slate-600">{val}</span>
-    },
-    {
-      key: "weight",
-      title: "Weight",
-      sortable: true,
-      render: (val) => <span className="font-bold text-slate-800">{val}</span>
-    },
-    {
-      key: "route",
-      title: "Route",
-      render: (_, row) => (
-        <div className="text-[11px] font-semibold leading-normal">
-          <p className="text-slate-800"><span className="text-slate-400 font-normal mr-1">From:</span>{row.origin}</p>
-          <p className="text-slate-800"><span className="text-slate-400 font-normal mr-1">To:</span>{row.destination}</p>
-        </div>
-      )
-    },
-    {
-      key: "dateSort",
-      title: "Date",
-      sortable: true,
-      render: (_, row) => (
-        <div className="text-[10px] font-semibold text-slate-500 leading-normal">
-          <p><span className="text-slate-400 font-normal mr-1">ATD:</span>{row.dateATD}</p>
-          <p><span className="text-slate-400 font-normal mr-1">ETA:</span>{row.dateETA}</p>
-        </div>
-      )
-    },
-    {
-      key: "progress",
-      title: "Progress",
-      sortable: true,
-      render: (val) => (
-        <div className="flex items-center gap-2 min-w-[90px] select-none">
-          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-            <div className="h-full bg-primary-500 rounded-full" style={{ width: `${val}%` }} />
-          </div>
-          <span className="text-xs font-bold text-slate-700">{val}%</span>
-        </div>
-      )
-    },
-    {
-      key: "status",
-      title: "Status",
-      sortable: true,
-      align: "right",
-      render: (val) => <StatusChip status={val} />
-    }
-  ];
-
   return (
-    <div className="space-y-6 pb-12 font-sans select-none">
+    <div className="space-y-6 pb-12 font-sans select-none max-w-[1440px] mx-auto text-slate-800">
       
-      {/* Page Header Area */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+      {/* 1. Header Toolbar Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-            <span className="hover:text-slate-700 cursor-pointer" onClick={() => navigate('/')}>Dashboard</span>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-slate-700">Shipments</span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-slate-900 tracking-tight">Shipments</h1>
+          {/* Breadcrumb path - Dashboard highlighted in purple below title */}
+          <div className="flex items-center gap-1.5 text-[10px] font-bold mt-1">
+            <span className="text-[#6366F1] hover:underline cursor-pointer" onClick={() => navigate('/')}>Dashboard</span>
+            <span className="text-slate-300 font-normal">/</span>
+            <span className="text-slate-400 font-semibold">Shipments</span>
           </div>
-          <h1 className="text-3xl font-extrabold font-heading text-slate-900 tracking-tight mt-1">Shipments</h1>
         </div>
 
-        {/* View Switcher segment toggle + Button */}
-        <div className="flex items-center gap-3 shrink-0 self-start md:self-center">
-          
-          {/* Custom designed view toggle segment bar */}
-          <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1">
-            <button
-              onClick={() => handleViewToggle('table')}
-              className={`px-3 py-2 rounded-lg flex items-center gap-1.5 text-xs font-bold transition-all cursor-pointer ${
-                activeView === 'table' 
-                  ? 'bg-white text-slate-900 shadow-sm' 
-                  : 'text-slate-500 hover:text-slate-800'
-              }`}
-              title="Table View"
-            >
-              <List className="h-4 w-4" />
-              <span className="hidden sm:inline">Table</span>
-            </button>
-            <button
-              onClick={() => handleViewToggle('grid')}
-              className={`px-3 py-2 rounded-lg flex items-center gap-1.5 text-xs font-bold transition-all cursor-pointer ${
-                activeView === 'grid' 
-                  ? 'bg-white text-slate-900 shadow-sm' 
-                  : 'text-slate-500 hover:text-slate-800'
-              }`}
-              title="Grid View"
-            >
-              <Grid className="h-4 w-4" />
-              <span className="hidden sm:inline">Grid</span>
-            </button>
-          </div>
-
-          {/* New shipment action */}
-          <Button 
-            variant="primary" 
-            className="rounded-xl font-bold flex items-center gap-1 px-4 py-2.5"
-            onClick={() => navigate('/shipments/create')}
-          >
-            <Plus className="h-4 w-4" />
-            <span>New Shipment</span>
-          </Button>
-
-        </div>
+        <button
+          onClick={() => navigate('/shipments/create')}
+          className="inline-flex items-center gap-1.5 px-4.5 py-3 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-all rounded-xl shadow-md cursor-pointer shrink-0 self-start sm:self-center"
+        >
+          <Plus className="h-4 w-4" />
+          <span>New Shipment</span>
+        </button>
       </div>
 
-      {/* Summary Aggregate Cards: Visible only in Table view as per Figma */}
-      {activeView === 'table' && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 animate-fade-in">
-          {[
-            { label: "Total Shipments", val: metrics.total.val, change: metrics.total.change, note: metrics.total.note, color: "text-[#6366F1]" },
-            { label: "Pending", val: metrics.pending.val, change: metrics.pending.change, note: metrics.pending.note, color: "text-slate-500" },
-            { label: "Delivery", val: metrics.delivery.val, change: metrics.delivery.change, note: metrics.delivery.note, color: "text-indigo-500", isNegative: true },
-            { label: "Completed", val: metrics.completed.val, change: metrics.completed.change, note: metrics.completed.note, color: "text-emerald-500" }
-          ].map((item, idx) => (
-            <div key={idx} className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col justify-between h-28 select-none">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</span>
-              <div className="flex items-baseline justify-between mt-1">
-                <span className={`text-2xl font-black font-heading ${item.color}`}>{item.val}</span>
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                  item.isNegative ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'
-                }`}>
-                  {item.change}
-                </span>
-              </div>
-              <span className="text-[10px] text-slate-400 font-semibold mt-1">Up {item.note}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Filtering Toolbar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white border border-slate-200 p-4 rounded-2xl shadow-sm">
-        
-        {/* Status tabs chips list */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 select-none">
-          {['All', 'Completed', 'Delivery', 'Pending'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => { setStatusTab(tab); setCurrentPage(1); }}
-              className={`px-4 py-2 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap ${
-                statusTab === tab 
-                  ? 'bg-slate-900 text-white border-slate-900' 
-                  : 'bg-white hover:bg-slate-50 text-slate-500 border-slate-200'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
+      {/* 2. Advanced Filters Row (No outer wrapping box) */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Status Filter Tab Pills - Segmented capsule container with white background shape */}
+        <div className="bg-white border border-slate-200/60 rounded-full p-1 flex items-center shadow-xs select-none">
+          {["All", "Delivered", "In Transit", "Processing", "Out for Delivery"].map((tab) => {
+            const isActive = activeFilterTab === tab;
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveFilterTab(tab)}
+                className={`px-5 py-2 text-[11px] font-bold rounded-full transition-all cursor-pointer ${
+                  isActive
+                    ? "bg-slate-800 text-white"
+                    : "text-slate-500 hover:text-slate-800"
+                }`}
+              >
+                {tab}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Inputs row: Search, Filter popover, Date Picker placeholder */}
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          
-          {/* Search box */}
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
+        {/* Search, Filter sliders, and Sort list dropdowns */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          {/* Search Shipment input */}
+          <div className="relative flex-1 sm:w-60">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              placeholder="Search id, company, etc..."
-              className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search Shipment"
+              className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
             />
           </div>
 
-          {/* Filter Popover dropdown */}
-          <button className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold bg-white text-slate-700 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-2 cursor-pointer">
+          {/* Filter button with down caret */}
+          <button className="px-3.5 py-2.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
             <Filter className="h-4 w-4 text-slate-400" />
             <span>Filter</span>
+            <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
           </button>
 
-          {/* Date Picker Range indicator */}
-          <button className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold bg-white text-slate-700 border border-slate-200 rounded-xl hover:bg-slate-50 flex items-center justify-center gap-2 cursor-pointer">
-            <Calendar className="h-4 w-4 text-slate-400" />
-            <span>This Month</span>
-          </button>
-
+          {/* Sort Dropdown split layout */}
+          <div className="flex items-center gap-2 text-xs font-semibold shrink-0">
+            <span className="text-slate-400 font-bold">Sort by:</span>
+            <div className="px-3.5 py-2.5 text-xs font-bold text-slate-800 bg-white border border-slate-200 rounded-xl flex items-center gap-1.5 shadow-xs cursor-pointer hover:bg-slate-50">
+              <span>Newest</span>
+              <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Primary Content Panel: Toggle Table vs Grid */}
-      {activeView === 'table' ? (
-        <Table
-          columns={columns}
-          data={paginatedShipments}
-          sortKey={sortKey}
-          sortDirection={sortDirection}
-          onSort={handleSort}
-          selectedRowIds={selectedRowIds}
-          onRowSelect={handleRowSelect}
-          onSelectAll={handleSelectAll}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          totalRecords={sortedShipments.length}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={setPageSize}
-          className="animate-fade-in"
-        />
-      ) : (
-        /* Grid Layout Mode */
-        <div className="space-y-6 animate-fade-in">
-          
-          {/* Main Card Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {paginatedShipments.map((ship) => (
-              <div 
-                key={ship.id}
-                className="bg-white border border-slate-200 hover:border-slate-300 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-[230px]"
-              >
-                {/* Card Top: Mode Icon, Tracking ID, Status Badge */}
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 bg-slate-50 rounded-lg">
-                      {getTransportIcon(ship.type)}
-                    </div>
-                    <div>
-                      <p className="font-black text-primary-600 text-sm leading-tight cursor-pointer hover:underline">
-                        {ship.id}
-                      </p>
-                      <p className="text-[9px] text-slate-400 font-bold uppercase mt-0.5">
-                        {ship.type}
-                      </p>
-                    </div>
-                  </div>
-                  <StatusChip status={ship.status} />
-                </div>
-
-                {/* Card Center: Origin & Destination path logs */}
-                <div className="py-3 flex flex-col gap-1.5 text-[11px] font-semibold text-slate-800">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="h-2 w-2 rounded-full border border-emerald-500 bg-emerald-50" />
-                    <p className="truncate">
-                      <span className="text-slate-400 font-normal mr-1">Origin:</span>{ship.origin}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="h-2 w-2 rounded-full border border-indigo-500 bg-indigo-50" />
-                    <p className="truncate">
-                      <span className="text-slate-400 font-normal mr-1">Dest:</span>{ship.destination}
-                    </p>
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-semibold pl-3.5 mt-0.5">
-                    ETA: {ship.dateETA}
-                  </div>
-                </div>
-
-                {/* Card Bottom: Progress bar, weight, details */}
-                <div className="border-t border-slate-100 pt-3 flex flex-col gap-2">
-                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
-                    <span className="text-slate-700">{ship.company}</span>
-                    <span>{ship.weight}</span>
-                  </div>
-                  
-                  {/* Progress Indicator line */}
-                  <div className="flex items-center gap-2 select-none">
-                    <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-primary-500 rounded-full" style={{ width: `${ship.progress}%` }} />
-                    </div>
-                    <span className="text-[10px] font-black text-slate-700 shrink-0">{ship.progress}%</span>
-                  </div>
+      {/* 3. 4-Column Shipment Cards Grid layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {filteredShipments.map((ship) => (
+          <div 
+            key={ship.id} 
+            className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:shadow-sm hover:border-slate-350 transition-all flex flex-col justify-between min-h-[410px] relative overflow-hidden"
+          >
+            {/* Header: Tracking ID + Status + Circle Icon container */}
+            <div className="flex justify-between items-start gap-3 border-b border-slate-100 pb-3.5 mb-3.5">
+              <div>
+                <p className="font-extrabold text-sm text-slate-900 tracking-tight">{ship.id}</p>
+                <div className={`mt-1.5 inline-flex items-center text-[9px] font-bold px-2 py-0.5 rounded-md border ${getStatusBadgeStyle(ship.status)}`}>
+                  {ship.status}
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Grid View Pagination Footer */}
-          {totalPages > 0 && (
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm text-xs select-none">
-              
-              {/* Page Selector dropdown */}
-              <div className="flex items-center gap-2">
-                <span className="text-slate-500">Show</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
-                  className="px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
-                >
-                  {[10, 20, 50].map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
-                  ))}
-                </select>
-                <span className="text-slate-500">of {sortedShipments.length} results</span>
-              </div>
-
-              {/* Number controls */}
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="p-1.5 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  Prev
-                </button>
-                {Array.from({ length: totalPages }).map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentPage(idx + 1)}
-                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg cursor-pointer ${
-                      currentPage === idx + 1 
-                        ? 'bg-primary-600 text-white shadow-sm' 
-                        : 'bg-white hover:bg-slate-50 text-slate-600 border border-slate-200'
-                    }`}
-                  >
-                    {idx + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="p-1.5 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  Next
-                </button>
+              {/* Transit icon circles outline */}
+              <div className="h-9 w-9 bg-slate-50 border border-slate-200/60 rounded-full flex items-center justify-center shrink-0 shadow-xs">
+                {renderCargoModeIcon(ship.type)}
               </div>
             </div>
-          )}
 
+            {/* Sender Company Details */}
+            <div className="flex items-center gap-3 select-none mb-1.5">
+              <div className="h-9 w-9 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 shadow-xs">
+                {renderCompanyLogo(ship.company)}
+              </div>
+              <div className="leading-tight truncate">
+                <p className="font-extrabold text-xs text-slate-800 truncate">{ship.company}</p>
+                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{ship.category}</p>
+              </div>
+            </div>
+
+            {/* Route Timeline enclosed in a rounded gray block */}
+            <div className="bg-slate-50/80 rounded-2xl p-4 my-3 flex justify-between items-stretch gap-4 select-none">
+              
+              {/* Left Column: Custom bullet circles & connecting line */}
+              <div className="flex flex-col items-center justify-between py-0.5 shrink-0 w-6 relative">
+                {/* Origin bullet */}
+                <div className="h-6 w-6 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
+                  <span className="h-2 w-2 rounded-full bg-[#6366F1]" />
+                </div>
+                {/* Solid connecting line */}
+                <div className="w-[2px] flex-1 bg-indigo-100/80 my-1" />
+                {/* Destination MapPin bullet */}
+                <div className="h-6 w-6 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
+                  <MapPin className="h-3.5 w-3.5 text-[#6366F1] fill-[#E0E7FF]" />
+                </div>
+              </div>
+
+              {/* Right Column: Route detail text */}
+              <div className="flex-1 flex flex-col justify-between h-[66px] text-[10px] leading-tight font-semibold">
+                
+                {/* Origin */}
+                <div className="flex justify-between items-start gap-2">
+                  <span className="text-slate-450 font-bold tracking-wider">Origin</span>
+                  <div className="text-right">
+                    <p className="font-extrabold text-slate-800 leading-none">{ship.origin}</p>
+                    <p className="text-[9px] text-slate-400 font-medium mt-1">{ship.originTime}</p>
+                  </div>
+                </div>
+
+                {/* Destination */}
+                <div className="flex justify-between items-start gap-2">
+                  <span className="text-slate-450 font-bold tracking-wider">Destination</span>
+                  <div className="text-right">
+                    <p className="font-extrabold text-slate-800 leading-none">{ship.destination}</p>
+                    <p className="text-[9px] text-slate-400 font-medium mt-1">{ship.destinationTime}</p>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Progress indicators and carriers footer block */}
+            <div className="flex flex-col gap-2 pt-2 select-none">
+              <div className="flex items-center justify-between text-[9px] font-bold">
+                <span className="text-slate-400 font-bold">Progres <span className="text-slate-800 font-extrabold">{ship.progress}%</span></span>
+                <span className="text-slate-400 font-bold">Carriers <span className="text-slate-900 font-extrabold">{ship.carrier}</span></span>
+              </div>
+              <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                <div 
+                  className="h-full bg-[#6366F1] rounded-full transition-all duration-300"
+                  style={{ width: `${ship.progress}%` }}
+                />
+              </div>
+            </div>
+
+          </div>
+        ))}
+      </div>
+
+      {/* 4. Paginated Bottom Footer bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-slate-200 px-5 py-4 rounded-2xl shadow-xs mt-8 select-none">
+        
+        {/* Page Limit sizes */}
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <span>Show</span>
+          <div className="relative">
+            <select className="appearance-none pr-8 pl-3.5 py-1.5 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none cursor-pointer">
+              <option>12</option>
+              <option>24</option>
+              <option>48</option>
+            </select>
+            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+          </div>
+          <span>of 520 results</span>
         </div>
-      )}
+
+        {/* Page indexes */}
+        <div className="flex items-center gap-1.5 text-xs font-bold">
+          <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-400 flex items-center justify-center cursor-pointer transition-colors">
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          
+          <button className="h-8 w-8 rounded-xl bg-[#6366F1] text-white flex items-center justify-center cursor-pointer">1</button>
+          <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center cursor-pointer transition-colors">2</button>
+          <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center cursor-pointer transition-colors">3</button>
+          <span className="px-1 text-slate-400">...</span>
+          <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center cursor-pointer transition-colors">16</button>
+          
+          <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-400 flex items-center justify-center cursor-pointer transition-colors">
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+      </div>
 
     </div>
   );

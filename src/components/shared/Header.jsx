@@ -4,7 +4,7 @@ import logoPurple from '../../assets/logo-purple.png';
 
 export default function Header({ onMenuClick }) {
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between w-full h-16 px-4 bg-white border-b border-slate-200 shadow-sm md:shadow-none">
+    <header className="sticky top-0 z-40 flex lg:hidden items-center justify-between w-full h-16 px-4 bg-white border-b border-slate-200 shadow-sm md:shadow-none">
       {/* Left side: Hamburger on mobile, Search bar on desktop */}
       <div className="flex items-center gap-4">
         {/* Mobile menu trigger */}
