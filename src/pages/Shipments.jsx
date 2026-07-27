@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Plane, 
-  Truck, 
-  Ship, 
-  Train, 
-  Search, 
-  Filter, 
-  ChevronRight, 
+import {
+  Plane,
+  Truck,
+  Ship,
+  Train,
+  Search,
+  Filter,
+  ChevronRight,
   Plus,
   ChevronDown,
   ChevronLeft,
@@ -330,7 +330,7 @@ export default function Shipments() {
 
   return (
     <div className="space-y-6 pb-12 font-sans select-none max-w-[1440px] mx-auto text-slate-800">
-      
+
       {/* 1. Header Toolbar Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -362,11 +362,10 @@ export default function Shipments() {
               <button
                 key={tab}
                 onClick={() => setActiveFilterTab(tab)}
-                className={`px-5 py-2 text-[11px] font-bold rounded-full transition-all cursor-pointer ${
-                  isActive
+                className={`px-5 py-2 text-[11px] font-bold rounded-full transition-all cursor-pointer ${isActive
                     ? "bg-slate-800 text-white"
                     : "text-slate-500 hover:text-slate-800"
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -409,12 +408,12 @@ export default function Shipments() {
       {/* 3. 4-Column Shipment Cards Grid layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredShipments.map((ship) => (
-          <div 
-            key={ship.id} 
-            className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:shadow-sm hover:border-slate-350 transition-all flex flex-col justify-between min-h-[410px] relative overflow-hidden"
+          <div
+            key={ship.id}
+            className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-sm hover:border-slate-350 transition-all flex flex-col justify-between min-h-[355px] relative overflow-hidden"
           >
-            {/* Header: Tracking ID + Status + Circle Icon container */}
-            <div className="flex justify-between items-start gap-3 border-b border-slate-100 pb-3.5 mb-3.5">
+            {/* Header: Tracking ID + Status + Rounded Square Icon container */}
+            <div className="flex justify-between items-start gap-3 border-b border-slate-200/80 pb-2.5 mb-1.5">
               <div>
                 <p className="font-extrabold text-sm text-slate-900 tracking-tight">{ship.id}</p>
                 <div className={`mt-1.5 inline-flex items-center text-[9px] font-bold px-2 py-0.5 rounded-md border ${getStatusBadgeStyle(ship.status)}`}>
@@ -422,14 +421,14 @@ export default function Shipments() {
                 </div>
               </div>
 
-              {/* Transit icon circles outline */}
-              <div className="h-9 w-9 bg-slate-50 border border-slate-200/60 rounded-full flex items-center justify-center shrink-0 shadow-xs">
+              {/* Transit icon rounded square container */}
+              <div className="h-9 w-9 bg-[#E2E8F0]/40 border border-slate-200/40 rounded-xl flex items-center justify-center shrink-0 shadow-xs">
                 {renderCargoModeIcon(ship.type)}
               </div>
             </div>
 
             {/* Sender Company Details */}
-            <div className="flex items-center gap-3 select-none mb-1.5">
+            <div className="flex items-center gap-3 select-none mb-1">
               <div className="h-9 w-9 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 shadow-xs">
                 {renderCompanyLogo(ship.company)}
               </div>
@@ -440,25 +439,25 @@ export default function Shipments() {
             </div>
 
             {/* Route Timeline enclosed in a rounded gray block */}
-            <div className="bg-slate-50/80 rounded-2xl p-4 my-3 flex justify-between items-stretch gap-4 select-none">
-              
+            <div className="bg-[#F1F5F9]/50 border border-slate-100 rounded-xl p-3 my-2.5 flex justify-between items-stretch gap-4 select-none">
+
               {/* Left Column: Custom bullet circles & connecting line */}
               <div className="flex flex-col items-center justify-between py-0.5 shrink-0 w-6 relative">
                 {/* Origin bullet */}
-                <div className="h-6 w-6 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
+                <div className="h-6 w-6 rounded-full bg-indigo-50/80 flex items-center justify-center shrink-0">
                   <span className="h-2 w-2 rounded-full bg-[#6366F1]" />
                 </div>
                 {/* Solid connecting line */}
                 <div className="w-[2px] flex-1 bg-indigo-100/80 my-1" />
                 {/* Destination MapPin bullet */}
-                <div className="h-6 w-6 rounded-full bg-indigo-50 flex items-center justify-center shrink-0">
+                <div className="h-6 w-6 rounded-full bg-indigo-50/80 flex items-center justify-center shrink-0">
                   <MapPin className="h-3.5 w-3.5 text-[#6366F1] fill-[#E0E7FF]" />
                 </div>
               </div>
 
               {/* Right Column: Route detail text */}
               <div className="flex-1 flex flex-col justify-between h-[66px] text-[10px] leading-tight font-semibold">
-                
+
                 {/* Origin */}
                 <div className="flex justify-between items-start gap-2">
                   <span className="text-slate-450 font-bold tracking-wider">Origin</span>
@@ -482,13 +481,13 @@ export default function Shipments() {
             </div>
 
             {/* Progress indicators and carriers footer block */}
-            <div className="flex flex-col gap-2 pt-2 select-none">
+            <div className="flex flex-col gap-2 pt-1 select-none">
               <div className="flex items-center justify-between text-[9px] font-bold">
                 <span className="text-slate-400 font-bold">Progres <span className="text-slate-800 font-extrabold">{ship.progress}%</span></span>
                 <span className="text-slate-400 font-bold">Carriers <span className="text-slate-900 font-extrabold">{ship.carrier}</span></span>
               </div>
               <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden shadow-inner">
-                <div 
+                <div
                   className="h-full bg-[#6366F1] rounded-full transition-all duration-300"
                   style={{ width: `${ship.progress}%` }}
                 />
@@ -501,7 +500,7 @@ export default function Shipments() {
 
       {/* 4. Paginated Bottom Footer bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border border-slate-200 px-5 py-4 rounded-2xl shadow-xs mt-8 select-none">
-        
+
         {/* Page Limit sizes */}
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
           <span>Show</span>
@@ -521,13 +520,13 @@ export default function Shipments() {
           <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-400 flex items-center justify-center cursor-pointer transition-colors">
             <ChevronLeft className="h-4 w-4" />
           </button>
-          
+
           <button className="h-8 w-8 rounded-xl bg-[#6366F1] text-white flex items-center justify-center cursor-pointer">1</button>
           <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center cursor-pointer transition-colors">2</button>
           <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center cursor-pointer transition-colors">3</button>
           <span className="px-1 text-slate-400">...</span>
           <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 flex items-center justify-center cursor-pointer transition-colors">16</button>
-          
+
           <button className="h-8 w-8 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-400 flex items-center justify-center cursor-pointer transition-colors">
             <ChevronRight className="h-4 w-4" />
           </button>

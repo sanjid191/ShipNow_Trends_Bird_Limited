@@ -81,13 +81,11 @@ export default function CreateShipment() {
       newErrors.quantity = 'Quantity must be greater than zero';
     }
 
-    // Date validations (ATD required, ETA required, ETA after ATD check)
+    // Date validations (ATD required, ETA after ATD check if ETA is present)
     if (!dateATD) {
       newErrors.dateATD = 'Shipment date is required';
     }
-    if (!dateETA) {
-      newErrors.dateETA = 'Delivery ETA date is required';
-    } else if (dateATD && new Date(dateETA) <= new Date(dateATD)) {
+    if (dateETA && dateATD && new Date(dateETA) <= new Date(dateATD)) {
       newErrors.dateETA = 'Estimated delivery (ETA) must be after shipment date (ATD)';
     }
 
@@ -118,6 +116,9 @@ export default function CreateShipment() {
     setErrors(formErrors);
 
     if (Object.keys(formErrors).length === 0) {
+      // Auto-generate ETA if not provided (default 3 days after ATD)
+      const finalETA = dateETA || new Date(new Date(dateATD).getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
       // Structure new shipment payload
       const payload = {
         id: trackingId,
@@ -130,7 +131,7 @@ export default function CreateShipment() {
         origin: pickupAddress || 'Origin Port',
         destination: deliveryAddress,
         dateATD: new Date(dateATD).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        dateETA: new Date(dateETA).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        dateETA: new Date(finalETA).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
         status: 'Pending',
         productCategory: itemDescription || 'General Cargo'
       };
@@ -145,24 +146,22 @@ export default function CreateShipment() {
     <div className="space-y-6 pb-12 font-sans select-none">
       
       {/* Top Header Panel */}
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-        <span className="hover:text-slate-700 cursor-pointer" onClick={() => navigate('/')}>Dashboard</span>
-        <span className="text-slate-300">/</span>
-        <span className="hover:text-slate-700 cursor-pointer" onClick={() => navigate('/shipments')}>Shipments</span>
-        <span className="text-slate-300">/</span>
-        <span className="text-slate-700">Create New Shipment</span>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <button 
+      <div>
+        <div 
           onClick={() => navigate('/shipments')}
-          className="p-2 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200 cursor-pointer"
-          aria-label="Go back to shipments"
+          className="flex items-center gap-2.5 text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight hover:text-slate-700 transition-colors cursor-pointer select-none"
         >
-          <ArrowLeft className="h-5 w-5 text-slate-600" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-black font-heading text-slate-900 leading-tight">Create New Shipment</h1>
+          <ArrowLeft className="h-6.5 w-6.5 text-slate-900 stroke-[3.5]" />
+          <span>Create New Shipment</span>
+        </div>
+        
+        {/* Breadcrumbs below the title */}
+        <div className="flex items-center gap-1.5 text-[10px] font-bold mt-1 select-none">
+          <span className="text-[#6366F1] hover:underline cursor-pointer" onClick={() => navigate('/')}>Dashboard</span>
+          <span className="text-slate-300 font-normal">/</span>
+          <span className="text-[#6366F1] hover:underline cursor-pointer" onClick={() => navigate('/shipments')}>Shipments</span>
+          <span className="text-slate-300 font-normal">/</span>
+          <span className="text-slate-400 font-semibold">Create New Shipment</span>
         </div>
       </div>
 
@@ -171,6 +170,9 @@ export default function CreateShipment() {
         
         {/* Main form body layout */}
         <div className="p-6 sm:p-8 space-y-8">
+
+          {/* Shipment Form Heading */}
+          <h2 className="text-lg font-bold text-slate-800 tracking-tight select-none">Shipment Form</h2>
           
           {/* Section 1: Sender & Recipient Info Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-6 border-b border-slate-100">
@@ -318,14 +320,13 @@ export default function CreateShipment() {
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* Section 2: Package & Shipping Details Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            {/* Package Details block */}
-            <div className="space-y-4">
+            {/* Package Details block (left column, 1/3 width) */}
+            <div className="space-y-4 lg:border-r lg:border-slate-200 lg:pr-8">
               <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Package Details</h3>
               
               <div className="space-y-3">
@@ -370,8 +371,8 @@ export default function CreateShipment() {
                 </div>
 
                 {/* Weight & Units selector */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="col-span-2 flex flex-col gap-1.5">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-bold text-slate-500">Weight</label>
                     <input
                       type="number"
@@ -427,210 +428,209 @@ export default function CreateShipment() {
                         type="text"
                         value={dimHeight}
                         onChange={(e) => setDimHeight(e.target.value)}
-                        placeholder="Height"
+                        placeholder="ex. 20"
                         className="w-full pl-3 pr-8 py-2.5 text-xs bg-[#F8FAFC] border border-slate-100 rounded-xl focus:outline-none"
                       />
                       <span className="absolute right-2.5 text-[9px] font-bold text-slate-400">cm</span>
                     </div>
                   </div>
+                  {/* Dimensions labels row */}
+                  <div className="grid grid-cols-3 gap-2 text-[9px] text-slate-450 font-bold mt-1">
+                    <span>Length</span>
+                    <span>Width</span>
+                    <span>Height</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Shipping Details block */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Shipping Details</h3>
+            {/* Shipping Details + Additional Services block (right column, 2/3 width) */}
+            <div className="lg:col-span-2 lg:pl-2 space-y-6">
               
-              <div className="space-y-3">
-                {/* Freight Type Radio Selector Row */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-500">Freight Type</label>
-                  <div className="flex items-center gap-4 py-1 flex-wrap select-none">
-                    {['Road Freight', 'Rail Freight', 'Ocean Freight', 'Air Freight'].map((type) => (
-                      <label key={type} className="flex items-center gap-1.5 text-xs font-bold text-slate-700 cursor-pointer">
+              {/* Shipping Details inner block */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Shipping Details</h3>
+                
+                <div className="space-y-4">
+                  {/* Freight Type Radio Selector Row */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-500">Freight Type</label>
+                    <div className="flex items-center gap-6 py-1 flex-wrap select-none">
+                      {['Road Freight', 'Rail Freight', 'Ocean Freight', 'Air Freight'].map((type) => (
+                        <label key={type} className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="freightType"
+                            checked={freightType === type}
+                            onChange={() => setFreightType(type)}
+                            className="h-4 w-4 text-[#6366F1] border-slate-350 focus:ring-primary-500 cursor-pointer accent-[#6366F1]"
+                          />
+                          <span>{type}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Carrier, Shipping Method, Shipment ID, Shipment Date row (4 columns) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-500">Carrier</label>
+                      <div className="relative">
+                        <select
+                          value={carrier}
+                          onChange={(e) => setCarrier(e.target.value)}
+                          className="w-full pl-3.5 pr-8 py-2.5 text-xs bg-[#F1F5F9]/50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer appearance-none"
+                        >
+                          <option value="FedEx">FedEx</option>
+                          <option value="DHL">DHL</option>
+                          <option value="UPS">UPS</option>
+                          <option value="USPS">USPS</option>
+                          <option value="Aramex">Aramex</option>
+                        </select>
+                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-500">Shipping Method</label>
+                      <div className="relative">
+                        <select
+                          value={shippingMethod}
+                          onChange={(e) => setShippingMethod(e.target.value)}
+                          className={`w-full pl-3.5 pr-8 py-2.5 text-xs bg-white border ${
+                            errors.shippingMethod ? 'border-red-500 focus:ring-red-100' : 'border-slate-200 focus:ring-primary-500'
+                          } rounded-xl focus:outline-none focus:ring-2 cursor-pointer appearance-none`}
+                        >
+                          <option value="">Select Method</option>
+                          <option value="Standard">Standard Delivery</option>
+                          <option value="Priority">Priority Express</option>
+                          <option value="Overnight">Overnight Delivery</option>
+                        </select>
+                        <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400 pointer-events-none" />
+                      </div>
+                      {errors.shippingMethod && (
+                        <span className="text-[10px] font-bold text-red-500 mt-0.5">{errors.shippingMethod}</span>
+                      )}
+                    </div>
+
+                    {/* Shipment ID */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-500">Shipment ID</label>
+                      <input
+                        type="text"
+                        value={trackingId}
+                        onChange={(e) => setTrackingId(e.target.value)}
+                        className="w-full px-3 py-2.5 text-xs bg-[#F1F5F9]/50 text-slate-700 border border-slate-200 rounded-xl focus:outline-none"
+                      />
+                      <span className="text-[9px] text-slate-400 font-semibold pl-0.5 mt-0.5">Auto-generated</span>
+                    </div>
+
+                    {/* Shipment Date (ATD) */}
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-500">Shipment Date</label>
+                      <div className="relative flex items-center">
                         <input
-                          type="radio"
-                          name="freightType"
-                          checked={freightType === type}
-                          onChange={() => setFreightType(type)}
-                          className="h-4 w-4 text-primary-600 border-slate-300 focus:ring-primary-500 cursor-pointer"
+                          type="date"
+                          value={dateATD}
+                          onChange={(e) => setDateATD(e.target.value)}
+                          className={`w-full px-3 py-2.5 text-xs bg-[#F1F5F9]/50 border ${
+                            errors.dateATD ? 'border-red-500' : 'border-slate-200'
+                          } rounded-xl focus:outline-none`}
                         />
-                        {type}
-                      </label>
-                    ))}
+                      </div>
+                      {errors.dateATD && (
+                        <span className="text-[10px] font-bold text-red-500 mt-0.5">{errors.dateATD}</span>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Carrier & Shipping Method dropdown */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500">Carrier</label>
-                    <select
-                      value={carrier}
-                      onChange={(e) => setCarrier(e.target.value)}
-                      className="w-full px-2.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
-                    >
-                      <option value="FedEx">FedEx</option>
-                      <option value="DHL">DHL</option>
-                      <option value="UPS">UPS</option>
-                      <option value="USPS">USPS</option>
-                      <option value="Aramex">Aramex</option>
-                    </select>
-                  </div>
-                  
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500">Shipping Method</label>
-                    <select
-                      value={shippingMethod}
-                      onChange={(e) => setShippingMethod(e.target.value)}
-                      className={`w-full px-2.5 py-2.5 text-xs bg-white border ${
-                        errors.shippingMethod ? 'border-red-500 focus:ring-red-100' : 'border-slate-200 focus:ring-primary-500'
-                      } rounded-xl focus:outline-none focus:ring-2 cursor-pointer`}
-                    >
-                      <option value="">Select Method</option>
-                      <option value="Standard">Standard Delivery</option>
-                      <option value="Priority">Priority Express</option>
-                      <option value="Overnight">Overnight Delivery</option>
-                    </select>
-                  </div>
-                </div>
-                {errors.shippingMethod && (
-                  <span className="text-[10px] font-bold text-red-500 block">{errors.shippingMethod}</span>
-                )}
-
-                {/* Shipment ID & Shipment Date / Delivery Date */}
-                <div className="grid grid-cols-3 gap-3">
-                  
-                  {/* Tracking ID */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500">Shipment ID</label>
-                    <input
-                      type="text"
-                      value={trackingId}
-                      onChange={(e) => setTrackingId(e.target.value)}
-                      className="w-full px-3 py-2.5 text-xs bg-slate-100 text-slate-700 border border-slate-200 rounded-xl focus:outline-none"
+                  {/* Notes Textarea */}
+                  <div className="flex flex-col gap-1.5 pt-1">
+                    <label className="text-xs font-bold text-slate-500">Notes</label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Add special delivery notes (optional)"
+                      rows={3}
+                      className="w-full px-3.5 py-2.5 text-xs bg-[#F8FAFC] border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
                     />
-                    <span className="text-[9px] text-slate-400 font-semibold pl-1">Auto-generated</span>
                   </div>
-
-                  {/* Shipment Date (ATD) */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500">Shipment Date (ATD)</label>
-                    <div className="relative flex items-center">
-                      <input
-                        type="date"
-                        value={dateATD}
-                        onChange={(e) => setDateATD(e.target.value)}
-                        className={`w-full px-3 py-2.5 text-xs bg-white border ${
-                          errors.dateATD ? 'border-red-500' : 'border-slate-200'
-                        } rounded-xl focus:outline-none`}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Estimated Delivery Date (ETA) */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-500">Delivery Date (ETA)</label>
-                    <div className="relative flex items-center">
-                      <input
-                        type="date"
-                        value={dateETA}
-                        onChange={(e) => setDateETA(e.target.value)}
-                        className={`w-full px-3 py-2.5 text-xs bg-white border ${
-                          errors.dateETA ? 'border-red-500' : 'border-slate-200'
-                        } rounded-xl focus:outline-none`}
-                      />
-                    </div>
-                  </div>
-
-                </div>
-                {errors.dateETA && (
-                  <span className="text-[10px] font-bold text-red-500 block">{errors.dateETA}</span>
-                )}
-
-                {/* Notes Textarea */}
-                <div className="flex flex-col gap-1.5 pt-1">
-                  <label className="text-xs font-bold text-slate-500">Notes</label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Add special delivery notes (optional)"
-                    rows={2}
-                    className="w-full px-3.5 py-2.5 text-xs bg-[#F8FAFC] border border-slate-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white"
-                  />
                 </div>
               </div>
-            </div>
 
-          </div>
+              {/* Divider above Additional Services */}
+              <div className="border-t border-slate-200 pt-6 mt-6" />
 
-          {/* Section 3: Additional Services & Toggle */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-6 border-t border-slate-100">
-            
-            {/* Checkbox columns */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Additional Services</h4>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={insurance}
-                    onChange={(e) => setInsurance(e.target.checked)}
-                    className="h-4.5 w-4.5 text-primary-600 border-slate-300 rounded focus:ring-primary-500 cursor-pointer"
-                  />
-                  Insurance Coverage
-                </label>
-                <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={tempControl}
-                    onChange={(e) => setTempControl(e.target.checked)}
-                    className="h-4.5 w-4.5 text-primary-600 border-slate-300 rounded focus:ring-primary-500 cursor-pointer"
-                  />
-                  Temperature Control
-                </label>
-                <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={signature}
-                    onChange={(e) => setSignature(e.target.checked)}
-                    className="h-4.5 w-4.5 text-primary-600 border-slate-300 rounded focus:ring-primary-500 cursor-pointer"
-                  />
-                  Signature on Delivery
-                </label>
-                <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={fragile}
-                    onChange={(e) => setFragile(e.target.checked)}
-                    className="h-4.5 w-4.5 text-primary-600 border-slate-300 rounded focus:ring-primary-500 cursor-pointer"
-                  />
-                  Fragile Item Handling
-                </label>
+              {/* Lower Row inside Shipping Details: Additional Services & Toggle Switch */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+                {/* Checkboxes: Col-span 3 */}
+                <div className="md:col-span-3 space-y-3">
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Additional Services</h4>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={insurance}
+                        onChange={(e) => setInsurance(e.target.checked)}
+                        className="h-4.5 w-4.5 text-primary-600 border-slate-355 rounded focus:ring-primary-500 cursor-pointer accent-[#6366F1]"
+                      />
+                      Insurance Coverage
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={tempControl}
+                        onChange={(e) => setTempControl(e.target.checked)}
+                        className="h-4.5 w-4.5 text-primary-600 border-slate-355 rounded focus:ring-primary-500 cursor-pointer accent-[#6366F1]"
+                      />
+                      Temperature Control
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={signature}
+                        onChange={(e) => setSignature(e.target.checked)}
+                        className="h-4.5 w-4.5 text-primary-600 border-slate-355 rounded focus:ring-primary-500 cursor-pointer accent-[#6366F1]"
+                      />
+                      Signature on Delivery
+                    </label>
+                    <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={fragile}
+                        onChange={(e) => setFragile(e.target.checked)}
+                        className="h-4.5 w-4.5 text-primary-600 border-slate-355 rounded focus:ring-primary-500 cursor-pointer accent-[#6366F1]"
+                      />
+                      Fragile Item Handling
+                    </label>
+                  </div>
+                </div>
+
+                {/* Toggle Switch: Col-span 2 */}
+                <div className="md:col-span-2 space-y-3">
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Tracking & Status Updates</h4>
+                  
+                  <div className="flex items-center gap-3">
+                    {/* Custom Toggle Switch */}
+                    <button
+                      type="button"
+                      onClick={() => setNotifyRecipient(!notifyRecipient)}
+                      className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        notifyRecipient ? 'bg-[#6366F1]' : 'bg-slate-200'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                          notifyRecipient ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                    <span className="text-xs font-bold text-slate-700">Notify Recipient via Email/SMS</span>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Toggle switch column */}
-            <div className="flex items-center justify-between lg:justify-end gap-6 bg-slate-50/50 p-5 rounded-2xl border border-slate-100/50">
-              <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-slate-800">Tracking & Status Updates</h4>
-                <p className="text-[10px] font-medium text-slate-400">Notify Recipient via Email/SMS</p>
-              </div>
-              {/* Custom Toggle Switch */}
-              <button
-                type="button"
-                onClick={() => setNotifyRecipient(!notifyRecipient)}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  notifyRecipient ? 'bg-primary-600' : 'bg-slate-200'
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    notifyRecipient ? 'translate-x-5' : 'translate-x-0'
-                  }`}
-                />
-              </button>
             </div>
 
           </div>
@@ -638,41 +638,31 @@ export default function CreateShipment() {
         </div>
 
         {/* Footer Actions block */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
+        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
           <button
             type="button"
-            onClick={() => navigate('/shipments')}
-            className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-100 bg-white rounded-xl transition-colors cursor-pointer"
+            onClick={() => {
+              // Reset form values to default empty states
+              setRecipientCompany('');
+              setRecipientPhone('');
+              setDeliveryAddress('');
+              setDimHeight('');
+              setShippingMethod('');
+              setDateETA('');
+              setErrors({});
+              setIsSubmitted(false);
+            }}
+            className="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-red-655 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
           >
-            Cancel
+            Delete Form
           </button>
           
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                // Reset form values to default empty states
-                setRecipientCompany('');
-                setRecipientPhone('');
-                setDeliveryAddress('');
-                setDimHeight('');
-                setShippingMethod('');
-                setDateETA('');
-                setErrors({});
-                setIsSubmitted(false);
-              }}
-              className="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
-            >
-              Delete Form
-            </button>
-            
-            <button
-              type="submit"
-              className="px-6 py-2.5 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl shadow-md transition-all cursor-pointer"
-            >
-              Submit Shipment
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="px-6 py-2.5 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl shadow-md transition-all cursor-pointer"
+          >
+            Submit Shipment
+          </button>
         </div>
 
       </form>
