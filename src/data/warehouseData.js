@@ -66,16 +66,16 @@ export const warehouseActivityLog = [
 
 export const warehouseFloorsData = {
   1: {
-    Electronics: { space: "20/100", bins: [{ id: "A1", filled: true }, { id: "A2", filled: true }, { id: "A3", filled: false }] },
-    "Home & Kitchen": { space: "10/100", bins: [{ id: "C1", filled: true }, { id: "C2", filled: true }, { id: "C3", filled: true }] },
-    "Automotive Parts": { space: "50/100", bins: [{ id: "D1", filled: true }, { id: "D2", filled: false }, { id: "D3", filled: false }] },
-    "Sports Equipment": { space: "45/100", bins: [{ id: "F1", filled: true }, { id: "F2", filled: false }, { id: "F3", filled: false }] },
+    Electronics: { space: "20/100", bins: [{ id: "A1", filled: false }, { id: "A2", filled: true }, { id: "A3", filled: false }] },
+    "Home & Kitchen": { space: "10/100", bins: [{ id: "C1", filled: false }, { id: "C2", filled: true }, { id: "C3", filled: true }] },
+    "Automotive Parts": { space: "50/100", bins: [{ id: "D1", filled: false }, { id: "D2", filled: true }, { id: "D3", filled: false }] },
+    "Sports Equipment": { space: "45/100", bins: [{ id: "F1", filled: false }, { id: "F2", filled: false }, { id: "F3", filled: true }] },
     Apparel: { space: "20/100", bins: [
-      { id: "B1", filled: true }, { id: "B2", filled: true }, { id: "B3", filled: true }, { id: "B4", filled: true },
-      { id: "B5", filled: false }, { id: "B6", filled: false }, { id: "B7", filled: false }, { id: "B8", filled: false },
-      { id: "B9", filled: false }, { id: "B10", filled: false }
+      { id: "B1", filled: false }, { id: "B2", filled: true }, { id: "B3", filled: true }, { id: "B4", filled: false },
+      { id: "B5", filled: false }, { id: "B6", filled: true }, { id: "B7", filled: true }, { id: "B8", filled: false },
+      { id: "B9", filled: true }, { id: "B10", filled: false }
     ] },
-    "Beauty & Health": { space: "30/100", bins: [{ id: "E1", filled: true }, { id: "E2", filled: false }, { id: "E3", filled: false }, { id: "E4", filled: false }] }
+    "Beauty & Health": { space: "30/100", bins: [{ id: "E1", filled: false }, { id: "E2", filled: true }, { id: "E3", filled: false }, { id: "E4", filled: false }] }
   },
   2: {
     Electronics: { space: "40/100", bins: [{ id: "A1", filled: true }, { id: "A2", filled: false }, { id: "A3", filled: false }] },

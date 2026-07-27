@@ -76,8 +76,8 @@ export default function Warehouse() {
 
   // Donut split calculation
   const donutData = [
-    { name: 'Loaded', value: capacityUsageDonut.percentage, color: '#6366f1' },
-    { name: 'Empty', value: 100 - capacityUsageDonut.percentage, color: '#e2e8f0' }
+    { name: 'Loaded', value: capacityUsageDonut.percentage, color: '#818cf8' },
+    { name: 'Empty', value: 100 - capacityUsageDonut.percentage, color: '#ffffff' }
   ];
 
   return (
@@ -86,13 +86,14 @@ export default function Warehouse() {
       {/* Top Header Row */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-            <span className="hover:text-slate-700 cursor-pointer" onClick={() => navigate('/')}>Dashboard</span>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-slate-700">Warehouse</span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight select-none">Warehouse</h1>
+          
+          {/* Breadcrumbs below the title */}
+          <div className="flex items-center gap-1.5 text-[10px] font-bold mt-1 select-none">
+            <span className="text-[#6366F1] hover:underline cursor-pointer" onClick={() => navigate('/')}>Dashboard</span>
+            <span className="text-slate-300 font-normal">/</span>
+            <span className="text-slate-400 font-semibold">Warehouse</span>
           </div>
-          <h1 className="text-3xl font-extrabold font-heading text-slate-900 tracking-tight mt-1">Warehouse</h1>
         </div>
 
         {/* Mode Toggle segment row */}
@@ -256,15 +257,17 @@ export default function Warehouse() {
           </Card>
 
           {/* Interactive Warehouse Floor Map grid */}
-          <Card 
-            title="Warehouse Map" 
-            actions={
-              <div className="bg-slate-100 p-0.5 rounded-lg flex items-center">
+          <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col">
+            {/* Header: Title + Floor Selectors */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 mb-4">
+              <h3 className="text-base font-bold text-slate-955 font-heading">Warehouse Map</h3>
+              
+              <div className="bg-slate-100 p-1 rounded-full flex items-center shadow-xs">
                 {[1, 2, 3].map((f) => (
                   <button
                     key={f}
                     onClick={() => setActiveFloor(f)}
-                    className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                    className={`px-4 py-1.5 text-[10px] font-bold rounded-full transition-all cursor-pointer whitespace-nowrap ${
                       activeFloor === f 
                         ? 'bg-slate-900 text-white shadow-sm' 
                         : 'text-slate-500 hover:text-slate-800'
@@ -274,53 +277,68 @@ export default function Warehouse() {
                   </button>
                 ))}
               </div>
-            }
-          >
-            <div className="space-y-6">
-              
-              {/* The grid list representing category groupings */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Object.entries(floorData).map(([catName, details]) => (
-                  <div key={catName} className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col justify-between gap-3 min-h-[120px]">
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-850">{catName}</h4>
-                      <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Available Space: {details.space}</p>
-                    </div>
+            </div>
 
-                    {/* Shelf bin pill items */}
-                    <div className="flex flex-wrap gap-1.5 select-none">
-                      {details.bins.map((bin) => (
-                        <div
-                          key={bin.id}
-                          className={`h-7 w-9 text-[10px] font-bold rounded-lg flex items-center justify-center border cursor-pointer transition-all ${
-                            bin.filled 
-                              ? 'bg-indigo-600 text-white border-indigo-700 shadow-sm' 
-                              : 'bg-white hover:bg-slate-50 text-slate-400 border-slate-200 font-semibold'
-                          }`}
-                          title={`Bin ${bin.id} - ${bin.filled ? 'Full' : 'Available'}`}
-                        >
-                          {bin.id}
+            {/* Inner light grey background container */}
+            <div className="bg-slate-50/50 border border-slate-200/50 rounded-2xl p-4">
+              
+              {/* Category Grid: 4 columns, Apparel spans 3 columns, Beauty & Health spans 1 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 select-none">
+                {Object.entries(floorData).map(([catName, details]) => {
+                  const colSpanClass = catName === "Apparel" ? "lg:col-span-3" : "lg:col-span-1";
+                  
+                  return (
+                    <div 
+                      key={catName} 
+                      className={`${colSpanClass} bg-white rounded-xl p-3.5 border border-slate-200/80 shadow-xs flex flex-col justify-between gap-3`}
+                    >
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900 tracking-tight">{catName}</h4>
+                        
+                        {/* Shelf bin items */}
+                        <div className="flex flex-wrap gap-1.5 mt-3">
+                          {details.bins.map((bin) => {
+                            const isAvailable = !bin.filled;
+                            return (
+                              <div
+                                key={bin.id}
+                                className={`h-8 w-10 text-[10px] font-bold rounded-lg flex items-center justify-center border transition-all select-none cursor-default ${
+                                  isAvailable
+                                    ? 'bg-[#EEF2FF] border-[#C7D2FE] text-[#312E81]'
+                                    : 'bg-[#F1F5F9] border-[#E2E8F0] text-slate-400 font-bold'
+                                }`}
+                                title={`Bin ${bin.id} - ${isAvailable ? 'Available' : 'Full'}`}
+                              >
+                                {bin.id}
+                              </div>
+                            );
+                          })}
                         </div>
-                      ))}
+                      </div>
+
+                      {/* Available Space Count */}
+                      <div className="text-[10px] text-slate-400 font-bold mt-1.5">
+                        Available Space <span className="text-slate-900 font-extrabold text-[11px] ml-0.5">{details.space}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
-              {/* Map Legend indicators */}
-              <div className="flex items-center gap-4 text-[10px] font-semibold text-slate-400 select-none pt-2 border-t border-slate-100">
-                <div className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 bg-white border border-slate-200 rounded-md shadow-sm" />
+              {/* Map Legend Indicators */}
+              <div className="flex items-center gap-5 text-[10px] font-bold text-slate-400 select-none mt-4 pt-3.5 border-t border-slate-200/50">
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-3.5 rounded bg-[#EEF2FF] border border-[#C7D2FE] inline-block shadow-xs shrink-0" />
                   <span>Available</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="h-3 w-3 bg-indigo-600 rounded-md shadow-sm" />
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-3.5 rounded bg-[#F1F5F9] border border-[#E2E8F0] inline-block shadow-xs shrink-0" />
                   <span>Full</span>
                 </div>
               </div>
 
             </div>
-          </Card>
+          </div>
 
         </div>
 
@@ -328,11 +346,14 @@ export default function Warehouse() {
         <div className="space-y-6">
           
           {/* Capacity Usage Circular Progress */}
-          <Card 
-            title="Capacity Usage" 
-            actions={<button className="text-slate-400 hover:text-slate-700 text-sm">•••</button>}
-          >
-            <div className="flex flex-col items-center justify-center">
+          <div className="bg-[#222222] border border-[#2d2d2d] p-6 rounded-2xl shadow-sm flex flex-col justify-between select-none">
+            {/* Header: Title + Options */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-white font-heading">Capacity Usage</h3>
+              <button className="text-slate-400 hover:text-slate-200 text-sm">•••</button>
+            </div>
+
+            <div className="flex flex-col items-center justify-center mt-5">
               
               {/* Circular Progress Container using Recharts donut */}
               <div className="relative h-44 w-44 flex items-center justify-center select-none">
@@ -356,26 +377,26 @@ export default function Warehouse() {
                 {/* Text centered inside the donut */}
                 <div className="absolute text-center flex flex-col items-center justify-center pointer-events-none select-none">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Usage</span>
-                  <span className="text-3xl font-black font-heading text-slate-800 leading-tight">
+                  <span className="text-3xl font-black font-heading text-white leading-tight">
                     {capacityUsageDonut.percentage}%
                   </span>
                 </div>
               </div>
 
               {/* Loaded vs Empty shelves counting row */}
-              <div className="flex items-center justify-between w-full mt-6 text-xs font-semibold select-none border-t border-slate-100 pt-4">
+              <div className="flex items-center justify-between w-full mt-6 text-xs font-semibold select-none border-t border-[#333333] pt-4">
                 <div>
                   <p className="text-slate-400">Loaded</p>
-                  <p className="text-base font-black text-slate-800 mt-0.5">{capacityUsageDonut.loadedShelves} shelves</p>
+                  <p className="text-base font-black text-white mt-0.5">{capacityUsageDonut.loadedShelves} shelves</p>
                 </div>
                 <div className="text-right">
                   <p className="text-slate-400">Empty</p>
-                  <p className="text-base font-black text-slate-800 mt-0.5">{capacityUsageDonut.emptyShelves} shelves</p>
+                  <p className="text-base font-black text-white mt-0.5">{capacityUsageDonut.emptyShelves} shelves</p>
                 </div>
               </div>
 
             </div>
-          </Card>
+          </div>
 
           {/* Package Status card list */}
           <Card 
