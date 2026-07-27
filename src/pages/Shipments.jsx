@@ -355,14 +355,14 @@ export default function Shipments() {
       {/* 2. Advanced Filters Row (No outer wrapping box) */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Status Filter Tab Pills - Segmented capsule container with white background shape */}
-        <div className="bg-white border border-slate-200/60 rounded-full p-1 flex items-center shadow-xs select-none">
+        <div className="bg-white border border-slate-200/60 rounded-xl md:rounded-full p-1 flex items-center shadow-xs select-none overflow-x-auto max-w-full scrollbar-none whitespace-nowrap gap-1">
           {["All", "Delivered", "In Transit", "Processing", "Out for Delivery"].map((tab) => {
             const isActive = activeFilterTab === tab;
             return (
               <button
                 key={tab}
                 onClick={() => setActiveFilterTab(tab)}
-                className={`px-5 py-2 text-[11px] font-bold rounded-full transition-all cursor-pointer ${isActive
+                className={`px-5 py-2 text-[11px] font-bold rounded-full transition-all cursor-pointer shrink-0 ${isActive
                     ? "bg-slate-800 text-white"
                     : "text-slate-500 hover:text-slate-800"
                   }`}
@@ -456,23 +456,23 @@ export default function Shipments() {
               </div>
 
               {/* Right Column: Route detail text */}
-              <div className="flex-1 flex flex-col justify-between h-[66px] text-[10px] leading-tight font-semibold">
+              <div className="flex-1 min-w-0 flex flex-col justify-between min-h-[66px] gap-2.5 text-[10px] leading-tight font-semibold">
 
                 {/* Origin */}
-                <div className="flex justify-between items-start gap-2">
-                  <span className="text-slate-450 font-bold tracking-wider">Origin</span>
-                  <div className="text-right">
-                    <p className="font-extrabold text-slate-800 leading-none">{ship.origin}</p>
-                    <p className="text-[9px] text-slate-400 font-medium mt-1">{ship.originTime}</p>
+                <div className="flex justify-between items-start gap-2 min-w-0">
+                  <span className="text-slate-450 font-bold tracking-wider shrink-0">Origin</span>
+                  <div className="text-right min-w-0">
+                    <p className="font-extrabold text-slate-800 leading-none truncate" title={ship.origin}>{ship.origin}</p>
+                    <p className="text-[8.5px] text-slate-400 font-medium mt-1 whitespace-nowrap">{ship.originTime}</p>
                   </div>
                 </div>
 
                 {/* Destination */}
-                <div className="flex justify-between items-start gap-2">
-                  <span className="text-slate-450 font-bold tracking-wider">Destination</span>
-                  <div className="text-right">
-                    <p className="font-extrabold text-slate-800 leading-none">{ship.destination}</p>
-                    <p className="text-[9px] text-slate-400 font-medium mt-1">{ship.destinationTime}</p>
+                <div className="flex justify-between items-start gap-2 min-w-0">
+                  <span className="text-slate-450 font-bold tracking-wider shrink-0">Destination</span>
+                  <div className="text-right min-w-0">
+                    <p className="font-extrabold text-slate-800 leading-none truncate" title={ship.destination}>{ship.destination}</p>
+                    <p className="text-[8.5px] text-slate-400 font-medium mt-1 whitespace-nowrap">{ship.destinationTime}</p>
                   </div>
                 </div>
 

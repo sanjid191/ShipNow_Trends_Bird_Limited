@@ -97,14 +97,14 @@ export default function Warehouse() {
         </div>
 
         {/* Mode Toggle segment row */}
-        <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 self-start md:self-center shrink-0">
+        <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 self-start md:self-center shrink-0 overflow-x-auto max-w-full scrollbar-none whitespace-nowrap">
           {['Road Freight', 'Rail Freight', 'Ocean Freight', 'Air Freight'].map((mode) => {
             const isActive = freightMode === mode;
             return (
               <button
                 key={mode}
                 onClick={() => setFreightMode(mode)}
-                className={`px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   isActive 
                     ? 'bg-[#1E293B] text-white shadow-sm' 
                     : 'text-slate-500 hover:text-slate-800'
@@ -225,7 +225,7 @@ export default function Warehouse() {
             }
           >
             <div className="overflow-x-auto select-none">
-              <table className="w-full text-left text-xs border-collapse">
+              <table className="w-full text-left text-xs border-collapse min-w-[600px]">
                 <thead>
                   <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <th className="py-2.5 px-2">Floor</th>
@@ -282,10 +282,10 @@ export default function Warehouse() {
             {/* Inner light grey background container */}
             <div className="bg-slate-50/50 border border-slate-200/50 rounded-2xl p-4">
               
-              {/* Category Grid: 4 columns, Apparel spans 3 columns, Beauty & Health spans 1 */}
+              {/* Category Grid: 4 columns, Apparel spans 3 columns on lg, 2 columns on sm, Beauty & Health spans 1 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 select-none">
                 {Object.entries(floorData).map(([catName, details]) => {
-                  const colSpanClass = catName === "Apparel" ? "lg:col-span-3" : "lg:col-span-1";
+                  const colSpanClass = catName === "Apparel" ? "sm:col-span-2 lg:col-span-3" : "sm:col-span-1 lg:col-span-1";
                   
                   return (
                     <div 

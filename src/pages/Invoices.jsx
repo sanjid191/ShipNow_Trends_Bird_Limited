@@ -353,22 +353,22 @@ export default function Invoices() {
               </div>
             </div>
             
-            {/* Table Body */}
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">
-                  <th className="py-3 px-4 w-10">
-                    {/* Empty header for Checkbox */}
-                  </th>
-                  <th className="py-3 px-4">Invoice ID <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
-                  <th className="py-3 px-4">Company <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
-                  <th className="py-3 px-4">Shipping ID <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
-                  <th className="py-3 px-4">Date <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
-                  <th className="py-3 px-4">Amount <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
-                  <th className="py-3 px-4 text-right">Status <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50 font-semibold text-slate-700">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse min-w-[800px]">
+                <thead>
+                  <tr className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">
+                    <th className="py-3 px-4 w-10">
+                      {/* Empty header for Checkbox */}
+                    </th>
+                    <th className="py-3 px-4">Invoice ID <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
+                    <th className="py-3 px-4">Company <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
+                    <th className="py-3 px-4">Shipping ID <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
+                    <th className="py-3 px-4">Date <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
+                    <th className="py-3 px-4">Amount <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
+                    <th className="py-3 px-4 text-right">Status <span className="text-[8px] text-slate-350 ml-0.5">↕</span></th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50 font-semibold text-slate-700">
                 {filteredInvoices.map((inv) => {
                   const sub = inv.lineItems.reduce((acc, i) => acc + (i.price * i.qty), 0);
                   const tax = sub * (inv.taxRate || 0.08);
@@ -436,6 +436,7 @@ export default function Invoices() {
             </table>
           </div>
         </div>
+      </div>
 
         {/* Right Side: Invoice Billing Detail Panel (4 columns on desktop) */}
         <div className="lg:col-span-4 print:col-span-12 print:w-full">
@@ -519,16 +520,17 @@ export default function Invoices() {
                 </div>
 
                 {/* === Items Table === */}
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 border-y border-slate-200 text-[9px] font-semibold text-slate-400 uppercase">
-                      <th className="py-2 px-4 text-left">Description <span className="text-[7px] normal-case">↕</span></th>
-                      <th className="py-2 px-2 text-left">Shipment Type <span className="text-[7px] normal-case">↕</span></th>
-                      <th className="py-2 px-2 text-left">Price <span className="text-[7px] normal-case">↕</span></th>
-                      <th className="py-2 px-2 text-center">Qty <span className="text-[7px] normal-case">↕</span></th>
-                      <th className="py-2 px-4 text-right">Amount <span className="text-[7px] normal-case">↕</span></th>
-                    </tr>
-                  </thead>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse min-w-[460px]">
+                    <thead>
+                      <tr className="bg-slate-50 border-y border-slate-200 text-[9px] font-semibold text-slate-400 uppercase">
+                        <th className="py-2 px-4 text-left">Description <span className="text-[7px] normal-case">↕</span></th>
+                        <th className="py-2 px-2 text-left">Shipment Type <span className="text-[7px] normal-case">↕</span></th>
+                        <th className="py-2 px-2 text-left">Price <span className="text-[7px] normal-case">↕</span></th>
+                        <th className="py-2 px-2 text-center">Qty <span className="text-[7px] normal-case">↕</span></th>
+                        <th className="py-2 px-4 text-right">Amount <span className="text-[7px] normal-case">↕</span></th>
+                      </tr>
+                    </thead>
                   <tbody>
                     {activeInvoice.lineItems.map((item, idx) => {
                       const parts = item.shipmentType.split(' ');
@@ -575,8 +577,9 @@ export default function Invoices() {
                       <td colSpan="3" className="py-3 px-2 text-[12px] font-bold text-slate-900">Total</td>
                       <td className="py-3 px-4 text-right text-[13px] font-black text-slate-900 whitespace-nowrap">${invoiceCalculations.total}</td>
                     </tr>
-                  </tbody>
-                </table>
+                    </tbody>
+                  </table>
+                </div>
 
               </div>
 
