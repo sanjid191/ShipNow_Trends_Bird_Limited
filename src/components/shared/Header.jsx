@@ -36,7 +36,7 @@ export default function Header({ onMenuClick }) {
       {/* Right side: Notifications & User profile */}
       <div className="flex items-center gap-3">
         {/* Notification Icon */}
-        <button 
+        <button
           className="relative p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors focus:outline-none"
           aria-label="View notifications"
         >

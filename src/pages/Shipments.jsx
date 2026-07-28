@@ -363,8 +363,8 @@ export default function Shipments() {
                 key={tab}
                 onClick={() => setActiveFilterTab(tab)}
                 className={`px-5 py-2 text-[11px] font-bold rounded-full transition-all cursor-pointer shrink-0 ${isActive
-                    ? "bg-slate-800 text-white"
-                    : "text-slate-500 hover:text-slate-800"
+                  ? "bg-slate-800 text-white"
+                  : "text-slate-500 hover:text-slate-800"
                   }`}
               >
                 {tab}
@@ -410,60 +410,60 @@ export default function Shipments() {
         {filteredShipments.map((ship) => (
           <div
             key={ship.id}
-            className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-sm hover:border-slate-350 transition-all flex flex-col justify-between min-h-[355px] relative overflow-hidden"
+            className="bg-white border border-slate-200 rounded-2xl p-3 md:p-4 shadow-xs hover:shadow-sm hover:border-slate-350 transition-all flex flex-col justify-between min-h-[295px] md:min-h-[355px] relative overflow-hidden"
           >
             {/* Header: Tracking ID + Status + Rounded Square Icon container */}
-            <div className="flex justify-between items-start gap-3 border-b border-slate-200/80 pb-2.5 mb-1.5">
+            <div className="flex justify-between items-start gap-3 border-b border-slate-200/80 pb-2 md:pb-2.5 mb-1 md:mb-1.5">
               <div>
-                <p className="font-extrabold text-sm text-slate-900 tracking-tight">{ship.id}</p>
-                <div className={`mt-1.5 inline-flex items-center text-[9px] font-bold px-2 py-0.5 rounded-md border ${getStatusBadgeStyle(ship.status)}`}>
+                <p className="font-extrabold text-xs md:text-sm text-slate-900 tracking-tight">{ship.id}</p>
+                <div className={`mt-1 md:mt-1.5 inline-flex items-center text-[8px] md:text-[9px] font-bold px-1.5 md:px-2 py-0.5 rounded-md border ${getStatusBadgeStyle(ship.status)}`}>
                   {ship.status}
                 </div>
               </div>
 
               {/* Transit icon rounded square container */}
-              <div className="h-9 w-9 bg-[#E2E8F0]/40 border border-slate-200/40 rounded-xl flex items-center justify-center shrink-0 shadow-xs">
+              <div className="h-8 w-8 md:h-9 md:w-9 bg-[#E2E8F0]/40 border border-slate-200/40 rounded-xl flex items-center justify-center shrink-0 shadow-xs">
                 {renderCargoModeIcon(ship.type)}
               </div>
             </div>
 
             {/* Sender Company Details */}
-            <div className="flex items-center gap-3 select-none mb-1">
-              <div className="h-9 w-9 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 shadow-xs">
+            <div className="flex items-center gap-2 md:gap-3 select-none mb-0.5 md:mb-1">
+              <div className="h-8 w-8 md:h-9 md:w-9 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100 shadow-xs">
                 {renderCompanyLogo(ship.company)}
               </div>
               <div className="leading-tight truncate">
-                <p className="font-extrabold text-xs text-slate-800 truncate">{ship.company}</p>
-                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{ship.category}</p>
+                <p className="font-extrabold text-[11px] md:text-xs text-slate-800 truncate">{ship.company}</p>
+                <p className="text-[9px] md:text-[10px] text-slate-400 font-semibold mt-0.5">{ship.category}</p>
               </div>
             </div>
 
             {/* Route Timeline enclosed in a rounded gray block */}
-            <div className="bg-[#F1F5F9]/50 border border-slate-100 rounded-xl p-3 my-2.5 flex justify-between items-stretch gap-4 select-none">
+            <div className="bg-[#F1F5F9]/50 border border-slate-100 rounded-xl p-2.5 md:p-3 my-1.5 md:my-2.5 flex justify-between items-stretch gap-2.5 md:gap-4 select-none min-w-0">
 
               {/* Left Column: Custom bullet circles & connecting line */}
-              <div className="flex flex-col items-center justify-between py-0.5 shrink-0 w-6 relative">
+              <div className="flex flex-col items-center justify-between py-0.5 shrink-0 w-5 md:w-6 relative">
                 {/* Origin bullet */}
-                <div className="h-6 w-6 rounded-full bg-indigo-50/80 flex items-center justify-center shrink-0">
-                  <span className="h-2 w-2 rounded-full bg-[#6366F1]" />
+                <div className="h-5 w-5 md:h-6 md:w-6 rounded-full bg-indigo-50/80 flex items-center justify-center shrink-0">
+                  <span className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-[#6366F1]" />
                 </div>
                 {/* Solid connecting line */}
-                <div className="w-[2px] flex-1 bg-indigo-100/80 my-1" />
+                <div className="w-[2px] flex-1 bg-indigo-100/80 my-0.5" />
                 {/* Destination MapPin bullet */}
-                <div className="h-6 w-6 rounded-full bg-indigo-50/80 flex items-center justify-center shrink-0">
+                <div className="h-5 w-5 md:h-6 md:w-6 rounded-full bg-indigo-50/80 flex items-center justify-center shrink-0">
                   <MapPin className="h-3.5 w-3.5 text-[#6366F1] fill-[#E0E7FF]" />
                 </div>
               </div>
 
               {/* Right Column: Route detail text */}
-              <div className="flex-1 min-w-0 flex flex-col justify-between min-h-[66px] gap-2.5 text-[10px] leading-tight font-semibold">
+              <div className="flex-1 min-w-0 flex flex-col justify-between min-h-[58px] md:min-h-[66px] gap-1.5 md:gap-2.5 text-[9px] md:text-[10px] leading-tight font-semibold">
 
                 {/* Origin */}
                 <div className="flex justify-between items-start gap-2 min-w-0">
                   <span className="text-slate-450 font-bold tracking-wider shrink-0">Origin</span>
                   <div className="text-right min-w-0">
                     <p className="font-extrabold text-slate-800 leading-none truncate" title={ship.origin}>{ship.origin}</p>
-                    <p className="text-[8.5px] text-slate-400 font-medium mt-1 whitespace-nowrap">{ship.originTime}</p>
+                    <p className="text-[8px] md:text-[8.5px] text-slate-400 font-medium mt-0.5 md:mt-1 md:whitespace-nowrap">{ship.originTime}</p>
                   </div>
                 </div>
 
@@ -472,7 +472,7 @@ export default function Shipments() {
                   <span className="text-slate-450 font-bold tracking-wider shrink-0">Destination</span>
                   <div className="text-right min-w-0">
                     <p className="font-extrabold text-slate-800 leading-none truncate" title={ship.destination}>{ship.destination}</p>
-                    <p className="text-[8.5px] text-slate-400 font-medium mt-1 whitespace-nowrap">{ship.destinationTime}</p>
+                    <p className="text-[8px] md:text-[8.5px] text-slate-400 font-medium mt-0.5 md:mt-1 md:whitespace-nowrap">{ship.destinationTime}</p>
                   </div>
                 </div>
 
@@ -481,8 +481,8 @@ export default function Shipments() {
             </div>
 
             {/* Progress indicators and carriers footer block */}
-            <div className="flex flex-col gap-2 pt-1 select-none">
-              <div className="flex items-center justify-between text-[9px] font-bold">
+            <div className="flex flex-col gap-1.5 md:gap-2 pt-0.5 md:pt-1 select-none">
+              <div className="flex items-center justify-between text-[8px] md:text-[9px] font-bold">
                 <span className="text-slate-400 font-bold">Progres <span className="text-slate-800 font-extrabold">{ship.progress}%</span></span>
                 <span className="text-slate-400 font-bold">Carriers <span className="text-slate-900 font-extrabold">{ship.carrier}</span></span>
               </div>
