@@ -64,4 +64,3 @@ npm run build
 * **Invoice Slider Element**: The Invoice detail view contains a scroll-based slider element which is not in the original Figma files, introduced to handle layout constraint formatting on smaller browser viewports.
 * **Mobile & Tablet Misalignments**: Several views on mobile/tablet viewports contain minor element misplacements or alignment deviations. Best efforts were made to replicate the Figma designs within responsive HTML limitations.
 * **Mobile Shipments Layout**: The mobile view of the Shipments page is not 100% ready and has some alignment-related differences due to screen space constraints.
-* **Typo Replication**: The database keys and labels feature typographical errors present in the original layout files (e.g. `Progres` instead of `Progress`). These were intentionally preserved to ensure matching mockup requirements.
