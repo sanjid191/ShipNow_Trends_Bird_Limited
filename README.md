@@ -10,6 +10,22 @@
 
 ---
 
+## 🛠️ Technology Stack Used
+
+| Technology Area | Selected Implementation | Role in the Project |
+| :--- | :--- | :--- |
+| **Framework** | **React SPA** (created with Vite) | Main client-side single page structure |
+| **Language** | **JavaScript** (ES6+ / JSX) | Interactive UI logic, maps, and state management |
+| **Styling** | **Tailwind CSS** | Premium responsive layout components and colors |
+| **Charts** | **Recharts** | Metrics AreaChart, Donut, and Grouped Bar charts |
+| **Routing** | **React Router DOM** | Client-side routes, sidebar links, and auth redirects |
+| **Icons** | **Lucide React** | Dashboards, map markers, and details visual icons |
+| **Backend / DB**| **None** (100% Client-Side) | Runs completely in-browser for static hosting compatibility |
+| **Data Storage** | **Local Mock Data** (Seeded arrays) | Seeded mock arrays matching target mockup specifications |
+| **Deployment** | **Netlify** | Configured with `_redirects` client-side rewrite rules |
+
+---
+
 ## 📋 Overview
 **ShipNow** is a modern, premium logistics and cargo management dashboard. It enables real-time shipment monitoring, interactive warehouse layouts, invoicing pipelines, and key metrics visualizations built using **React, Vite, Tailwind CSS, and Recharts**.
 
